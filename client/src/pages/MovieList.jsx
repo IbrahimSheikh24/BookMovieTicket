@@ -1,7 +1,6 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
-import { jtwToken } from '../constants/authToken';
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);

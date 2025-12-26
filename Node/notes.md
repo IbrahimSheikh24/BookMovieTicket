@@ -31,3 +31,7 @@ What is express()?
 express() is a function that creates an Express application.
 The app object returned by express() has methods for routing HTTP requests, configuring middleware, rendering HTML views, and registering a template engine.
 
+- Authentication: A user provides their credentials (like email and password) to prove their identity. If the credentials are valid, the user is considered authenticated and can access protected resources.
+
+- Authorization: After a user is authenticated, authorization determines what resources or actions the user is allowed to access. It checks the user's permissions and roles to ensure they have the right to perform specific actions or access certain data.
+

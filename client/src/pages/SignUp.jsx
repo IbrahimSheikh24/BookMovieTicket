@@ -3,6 +3,39 @@ import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [userData, setUserData] = useState({});
+  const navigate = useNavigate();
+
+  const handleFieldChange = (key) => (e) => {
+    const value = e.target.value;
+    setUserData((prevFields) => ({
+      ...prevFields,
+      [key]: value,
+    }));
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault(); // this will prevent to submit the default behaviour of form.
+    fetch("http://localhost:5001/api/user", {
+      method: "POST",
+      body: JSON.stringify(userData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if(data.success) {
+          console.log('User created successfully:', data);
+          navigate("/login");
+        } else {
+          window.alert('Error: ' + data.message);
+        }
+      })
+      .catch((e) => {
+        window.alert(e.message);
+      });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -20,6 +53,7 @@ const SignUp = () => {
               id="name"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Name"
+              onChange={handleFieldChange("name")}
             />
           </div>
           <div className="mb-4">
@@ -34,6 +68,7 @@ const SignUp = () => {
               id="email"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Email"
+              onChange={handleFieldChange("email")}
             />
           </div>
           <div className="mb-4">
@@ -48,6 +83,7 @@ const SignUp = () => {
               id="phone"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Phone"
+              onChange={handleFieldChange("phone")}
             />
           </div>
           <div className="mb-4">
@@ -62,6 +98,7 @@ const SignUp = () => {
               id="password"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Password"
+              onChange={handleFieldChange("password")}
             />
           </div>
           <div className="mb-6">
@@ -76,8 +113,9 @@ const SignUp = () => {
               id="confirm-password"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Confirm Password"
+              onChange={handleFieldChange("confirmPassword")}
             />
-            {userData?.confirmPassword !== userData?.password && (
+            {userData.confirmPassword !== userData.password && (
               <p className="text-red-500">
                 Password and Confirm password don't match
               </p>
@@ -87,7 +125,15 @@ const SignUp = () => {
           <div className="flex items-center justify-between">
             <button
               type="submit"
+              onClick={handleRegister}
               className="bg-blue-500 hover:bg-blue-700 disabled:bg-slate-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={
+                !userData.name ||
+                !userData.email ||
+                !userData.phone ||
+                !userData.password ||
+                userData.confirmPassword !== userData.password
+              }
             >
               Register
             </button>
