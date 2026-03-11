@@ -165,7 +165,6 @@ export const getUserByToken = async (req, res) => {
     console.log('getUserByToken');
     try {
         const jwtToken = req.headers['jwtToken'];
-        console.log('Received JWT Token: ', jwtToken);
         const decodedToken = jwt.verify(jwtToken, process.env.jwt_secret_salt);
         if(decodedToken) {
             console.log('Decoded JWT Token: ', decodedToken);
