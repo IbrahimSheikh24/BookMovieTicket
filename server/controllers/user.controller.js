@@ -154,7 +154,7 @@ export const login = async(req, res) => {
             if(user) {
                 const isValid = await bcrypt.compare(userBody.password, user.password);
                 if(isValid) {
-                    const token = jwt.sign({email: user.email, isAdmin: user.isAdmin}, process.env.jwt_secret_salt, {expiresIn: '1d'});
+                    const token = jwt.sign({email: user.email, isAdmin: user.isAdmin}, process.env.jwt_secret_salt, {expiresIn: '2m'});
                     res.setHeader("Access-Control-Expose-Headers", "jwtToken");
                     res.setHeader('jwtToken', token);
                     console.log("Generated JWT Token: ", token);
