@@ -3,20 +3,18 @@ import { createUser, deleteUser, getAllUsers, getUserById, getUserByToken, login
 
 const router = expres.Router();
 
-router.post('/', createUser);
-
-// router.post('/login', login);
+router.post('/signup', createUser);
 
 router.get('/getUsers', getAllUsers)
+
+router.post('/login', login);
+
+router.get('/getUserByToken', getUserByToken);
 
 router.get('/:id', getUserById)
 
 router.put('/:id', updateUser);
 
 router.delete('/:id', deleteUser);
-
-router.post('/login', login);
-
-router.get('/getUserByToken', getUserByToken);
 
 export default router;

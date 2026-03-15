@@ -3,24 +3,48 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export const createUser = async (req, res) => {
-    try {
-        const body = req.body;
-        const newUser = await User.create(body);
-        res.status(200).json({
-            success: true,
-            message: "User created successfully",
-            data: newUser,
-            statusCode: 200
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error creating user",
-            error: error.message,
-            statusCode: 500
-        });
+  try {
+    const body = req.body;
+    const newUser = await User.create(body);
+    res.status(200).json({
+      success: true,
+      message: "User created successfully",
+      data: newUser,
+      statusCode: 200
+    });
+  } catch (error) {
+    // Handle MongoDB duplicate key error (E11000)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0]; // 'email', 'phone', etc.
+      return res.status(409).json({
+        success: false,
+        message: `A user with this ${field} already exists`,
+        error: `${field}_already_exists`,
+        statusCode: 409
+      });
     }
-}
+
+    // Handle other validation errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        error: Object.values(error.errors)
+          .map((e) => e.message)
+          .join(', '),
+        statusCode: 400
+      });
+    }
+
+    // Generic error
+    res.status(500).json({
+      success: false,
+      message: 'Error creating user',
+      error: error.message,
+      statusCode: 500
+    });
+  }
+};
 
 export const getAllUsers = async (req, res) => {
     console.log('GetAllusers');
@@ -137,7 +161,7 @@ export const login = async(req, res) => {
                     res.status(200).send( {
                         success: true,
                         message: 'Login Successful',
-                        data: token
+                        data: {token, user}
                     })
                 } else {
                         res.status(401).send({
@@ -161,10 +185,11 @@ export const login = async(req, res) => {
     }
 }
 
-export const getUserByToken = async (req, res) => {
+export const getUserByToken = async(req, res) => {
     console.log('getUserByToken');
     try {
-        const jwtToken = req.headers['jwtToken'];
+        const jwtToken = req.headers['jwttoken'];
+        console.log('Retrieved Token: ', jwtToken)
         const decodedToken = jwt.verify(jwtToken, process.env.jwt_secret_salt);
         if(decodedToken) {
             console.log('Decoded JWT Token: ', decodedToken);
